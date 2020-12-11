@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const port = 5000
 
+const config = require('./config/key')
+
 const bodyParser = require('body-parser')           //Body-Parser
 const {User} = require("./models/User")             //User 모듈 가져오기
 
@@ -9,7 +11,7 @@ app.use(bodyParser.urlencoded({extended: true}))    //application/x-www-form-url
 app.use(bodyParser.json())                          //application/json
 
 const mongoose = require('mongoose')
-mongoose.connect('mongodb+srv://seo:0000@boiler-plate.mlzqt.mongodb.net/test?retryWrites=true&w=majority', {
+mongoose.connect(config.mongoURI, {
     useNewUrlParser: true, 
     useUnifiedTopology: true,
     useCreateIndex: true,
