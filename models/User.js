@@ -6,6 +6,9 @@ const bycrypt = require('bcrypt');
 //saltRounds 값 설정
 const saltRounds = 10;
 
+//jsonwebtoken 모듈 가져오기
+const jwt = require('jsonwebtoken');
+
 //mongoose 이용해서 schema 생성
 const userSchema = mongoose.Schema({
     name: {
@@ -60,6 +63,29 @@ userSchema.pre('save', function(next) {
         next();
     }
 });
+
+//입력한 비밀번호와 DB 저장된 비밀번호 같은지 비교하는 method
+userSchema.methods.comparePassword = function(plainPassword, cb) {
+    bycrypt.compare(plainPassword, this.password, function(err, isMatch) {
+        if(err) return cb(err);
+        cb(null, isMatch);
+    });
+};
+
+//토큰 생성하는 method
+userSchema.methods.generateToken = function(cb) {
+
+    var user = this;
+
+    //jsonwebtoken 이용하여 토큰 생성
+    var token = jwt.sign(user._id.toHexString(), 'secretToken');
+
+    user.token = token;
+    user.save(function(err, user) {
+        if(err) return cb(err);
+        cb(null, user);
+    });
+};
 
 //schema를 model로 감싸주기
 const User = mongoose.model('User', userSchema)
