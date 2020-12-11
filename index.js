@@ -20,7 +20,7 @@ mongoose.connect('mongodb+srv://seo:0000@boiler-plate.mlzqt.mongodb.net/test?ret
 
 //기본 Route
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.send('Hello World! Hi!')
 })
 
 //회원가입 Route
