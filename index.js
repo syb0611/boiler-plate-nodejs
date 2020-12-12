@@ -7,6 +7,7 @@ const config = require('./config/key')
 const bodyParser = require('body-parser')           //Body-Parser
 const cookieParser = require('cookie-parser');      //cookie-parser
 
+const {auth} = require('./middleware/auth');        //auth
 const {User} = require("./models/User")             //User 모듈 가져오기
 
 app.use(bodyParser.urlencoded({extended: true}))    //application/x-www-form-urlencoded
@@ -29,7 +30,7 @@ app.get('/', (req, res) => {
 })
 
 //회원가입 Route
-app.post('/register', (req, res) => {
+app.post('/api/users/register', (req, res) => {
 
     //회원가입 시 필요한 정보들을 client에서 가져와서 DB 저장
 
@@ -42,7 +43,7 @@ app.post('/register', (req, res) => {
 })
 
 //로그인 Route
-app.post('/login', (req, res) => {
+app.post('/api/users/login', (req, res) => {
     //1. 요청한 email을 DB에서 찾기
     User.findOne({email: req.body.email}, (err, user) => {
         if(!user) {
@@ -72,6 +73,23 @@ app.post('/login', (req, res) => {
                 .json({loginSuccess: true, userId: user._id});
             });
         });
+    });
+});
+
+//Auth Route
+app.get('/api/users/auth', auth, (req, res) => {
+    //여기까지 미들웨어 통과해서 왔다는 얘기는 Authentication이 True!
+
+    //클라이언트에게 정보 전달
+    res.status(200).json({
+        _id: req.user._id,
+        isAdmin: req.user.role === 0 ? false : true, //role 0 -> 일반 유저, 0이 아니면 -> admin
+        isAuth: true,
+        email: req.user.email,
+        name: req.user.name,
+        lastname: req.user.lastname,
+        role: req.user.role,
+        image: req.user.image
     });
 });
 
